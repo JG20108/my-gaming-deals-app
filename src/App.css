@@ -2,9 +2,9 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr); /* Define 6 columns */
   gap: 1rem;
-  padding: 1rem;
-  width: 80%; /* Keep width at 80% */
+  width: calc(80% - 1rem); /* Adjusted to account for the gap */
   float: left; /* Keep aligned to the left */
+  min-height: 500px; /* Ensure a minimum height */
 }
 
 .deal-card {
@@ -26,4 +26,19 @@
   padding: 1rem;
   height: 100vh; /* Optional: Set to full viewport height */
   box-sizing: border-box;
+  border-left: 2px solid #ddd; /* Visual separation from the deals grid */
+  min-height: 500px; /* Ensure a minimum height */
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .filters-sidebar, .deals-grid {
+    width: 100%;
+    float: none;
+  }
 }
