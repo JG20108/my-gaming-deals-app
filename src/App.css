@@ -1,8 +1,10 @@
 .deals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(6, 1fr); /* Define 6 columns */
   gap: 1rem;
   padding: 1rem;
+  width: 80%; /* Keep width at 80% */
+  float: left; /* Keep aligned to the left */
 }
 
 .deal-card {
@@ -16,4 +18,12 @@
   max-width: 100%;
   height: auto;
   border-radius: 8px;
+}
+
+.filters-sidebar {
+  width: 20%; /* Set width to 20% */
+  float: right; /* Align to the right */
+  padding: 1rem;
+  height: 100vh; /* Optional: Set to full viewport height */
+  box-sizing: border-box;
 }
