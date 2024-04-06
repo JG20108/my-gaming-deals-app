@@ -6,7 +6,7 @@ interface RangeFilterDualProps {
   max: number;
   step: number;
   value: [number, number];
-  onChange: (value: [number, number]) => void;
+  onChange: (value: number[]) => void; 
 }
 
 const RangeFilterDual: React.FC<RangeFilterDualProps> = ({ label, min, max, step, value, onChange }) => (
@@ -17,7 +17,7 @@ const RangeFilterDual: React.FC<RangeFilterDualProps> = ({ label, min, max, step
       min={min}
       max={max}
       values={value}
-      onChange={onChange}
+      onChange={(values) => onChange(values as [number, number])} 
       renderTrack={({ props, children }) => (
         <div {...props} style={{ ...props.style, height: '6px', width: '100%', backgroundColor: '#ccc' }}>
           {children}

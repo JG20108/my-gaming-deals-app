@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { fetchDeals } from '../../services/DealService';
-import DealCard from '../molecules/DealCard';
-import SearchBar from '../molecules/SearchBar'; // New import for SearchBar
-import RangeFilterDual from '../molecules/RangeFilterDual'; // Corrected import statement
+import SearchBar from '../molecules/SearchBar';
+import RangeFilterDual from '../molecules/RangeFilterDual';
+import DealsGrid from '../organisms/DealsGrid';
 
 interface Deal {
   dealID: string;
@@ -11,10 +11,10 @@ interface Deal {
   normalPrice: string;
   savings: string;
   thumb: string;
-  metacriticScore: string; // New
-  metacriticLink: string; // New
-  steamRatingText: string; // New
-  steamAppID: string; // New
+  metacriticScore: string;
+  metacriticLink: string;
+  steamRatingText: string;
+  steamAppID: string;
 }
 
 const DealsPage: React.FC = () => {
@@ -25,12 +25,12 @@ const DealsPage: React.FC = () => {
 
   useEffect(() => {
     fetchDeals()
-      .then((deals) => {
-        const sortedDeals = deals.sort((a, b) => Number(b.metacriticScore) - Number(a.metacriticScore));
-        console.log(sortedDeals); // Log the fetched and sorted deals data
+      .then((deals: Deal[]) => {
+        const sortedDeals = deals.sort((a: Deal, b: Deal) => Number(b.metacriticScore) - Number(a.metacriticScore));
+        console.log(sortedDeals); 
         setDeals(sortedDeals);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error('Failed to fetch deals:', error);
       });
   }, []);
@@ -42,26 +42,7 @@ const DealsPage: React.FC = () => {
 
   return (
     <div>
-      <div className="deals-grid">
-        {filteredDeals.length > 0 ? (
-          filteredDeals.map((deal) => (
-            <DealCard
-              key={deal.dealID}
-              title={deal.title}
-              salePrice={deal.salePrice}
-              normalPrice={deal.normalPrice}
-              savings={deal.savings}
-              thumb={deal.thumb}
-              metacriticScore={deal.metacriticScore} // New
-              metacriticLink={deal.metacriticLink} // New
-              steamRatingText={deal.steamRatingText} // New
-              steamAppID={deal.steamAppID} // New
-            />
-          ))
-        ) : (
-          <div className="empty-state">No deals match your filters.</div>
-        )}
-      </div>
+      <DealsGrid deals={filteredDeals} />
       <div className="filters-sidebar">
         <SearchBar onSearch={(query) => console.log(query)} />
         <RangeFilterDual
@@ -70,7 +51,7 @@ const DealsPage: React.FC = () => {
           max={100}
           step={10}
           value={metacriticScoreFilter}
-          onChange={setMetacriticScoreFilter}
+          onChange={(value: number[]) => setMetacriticScoreFilter([value[0], value[1]])}
         />
         <RangeFilterDual
           label="Sale Price"
@@ -78,7 +59,7 @@ const DealsPage: React.FC = () => {
           max={100} 
           step={10}
           value={salePriceRange}
-          onChange={setSalePriceRange}
+          onChange={(value: number[]) => setSalePriceRange([value[0], value[1]])}
         />
         <RangeFilterDual
           label="Savings"
@@ -86,7 +67,7 @@ const DealsPage: React.FC = () => {
           max={100}
           step={10}
           value={savingsFilter}
-          onChange={setSavingsFilter}
+          onChange={(value: number[]) => setSavingsFilter([value[0], value[1]])}
         />
         {/* Additional filters can be placed here */}
       </div>

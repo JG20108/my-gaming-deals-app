@@ -5,6 +5,10 @@
   width: calc(80% - 1rem); /* Adjusted to account for the gap */
   float: left; /* Keep aligned to the left */
   min-height: 500px; /* Ensure a minimum height */
+  max-height: 100%; /* Change from none to 100% */
+  height: 100%; /* Change from auto to 100% */
+  overflow-y: scroll; /* Always show vertical scrollbar */
+  min-width: 1506px; /* Set a fixed minimum width */
 }
 
 .deal-card {
@@ -28,17 +32,21 @@
   box-sizing: border-box;
   border-left: 2px solid #ddd; /* Visual separation from the deals grid */
   min-height: 500px; /* Ensure a minimum height */
+  min-width: 346px; /* Set a fixed minimum width */
 }
 
 .empty-state {
   text-align: center;
   padding: 2rem;
   color: #666;
+  height: 100%; /* Ensure it occupies the full height of its container */
+  width: 80%; /* Ensure it occupies the full width of its container */
 }
 
-@media (max-width: 768px) {
-  .filters-sidebar, .deals-grid {
-    width: 100%;
+@media (max-width: 1600px) {
+  .deals-grid, .filters-sidebar {
+    min-width: auto; /* Adjust widths for smaller screens */
+    width: 100%; /* Make both components full width on smaller screens */
     float: none;
   }
 }
