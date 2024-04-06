@@ -8,7 +8,7 @@ interface DealsGridProps {
 
 const DealsGrid: React.FC<DealsGridProps> = ({ deals }) => {
   return (
-    <div className={`deals-grid ${deals.length > 0 ? "has-deals" : ""}`}>
+    <div className={`deals-grid ${deals.length > 0 ? "has-deals" : "no-deals"}`}>
       {deals.length > 0 ? (
         deals.map((deal) => (
           <DealCard

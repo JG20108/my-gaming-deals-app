@@ -5,10 +5,12 @@
   width: calc(80% - 1rem); /* Adjusted to account for the gap */
   float: left; /* Keep aligned to the left */
   min-height: 500px; /* Ensure a minimum height */
-  max-height: 100%; /* Change from none to 100% */
+  max-height: 100vh; /* Set maximum height to viewport height */
   height: 100%; /* Change from auto to 100% */
-  overflow-y: scroll; /* Always show vertical scrollbar */
+  overflow-y: auto; /* Enable scrolling within the grid */
   min-width: 1506px; /* Set a fixed minimum width */
+  padding-right: 15px; /* Space for scrollbar */
+  box-sizing: border-box; /* Include padding in the width calculation */
 }
 
 .deal-card {
@@ -33,6 +35,8 @@
   border-left: 2px solid #ddd; /* Visual separation from the deals grid */
   min-height: 500px; /* Ensure a minimum height */
   min-width: 346px; /* Set a fixed minimum width */
+  max-height: 100vh; /* Set maximum height to viewport height */
+  overflow-y: auto; /* Enable scrolling within the element */
 }
 
 .empty-state {
@@ -41,6 +45,16 @@
   color: #666;
   height: 100%; /* Ensure it occupies the full height of its container */
   width: 80%; /* Ensure it occupies the full width of its container */
+  overflow-y: hidden; /* Hide scrollbar */
+}
+
+.no-deals {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  height: 100%; /* Ensure it occupies the full height of its container */
+  width: 80%; /* Ensure it occupies the full width of its container */
+  overflow-y: hidden; /* Hide scrollbar */
 }
 
 @media (max-width: 1600px) {
