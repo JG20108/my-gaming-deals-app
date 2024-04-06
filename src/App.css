@@ -1,16 +1,83 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
 .deals-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* Define 6 columns */
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
-  width: calc(80% - 1rem); /* Adjusted to account for the gap */
-  float: left; /* Keep aligned to the left */
-  min-height: 500px; /* Ensure a minimum height */
-  max-height: 100vh; /* Set maximum height to viewport height */
-  height: 100%; /* Change from auto to 100% */
-  overflow-y: auto; /* Enable scrolling within the grid */
-  min-width: 1506px; /* Set a fixed minimum width */
-  padding-right: 15px; /* Space for scrollbar */
-  box-sizing: border-box; /* Include padding in the width calculation */
+  width: calc(80% - 1rem);
+  float: left;
+  min-height: 500px;
+  max-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  min-width: 1506px;
+  padding-right: 15px;
+  box-sizing: border-box;
 }
 
 .deal-card {
@@ -27,40 +94,31 @@
 }
 
 .filters-sidebar {
-  width: 20%; /* Set width to 20% */
-  float: right; /* Align to the right */
+  width: 20%;
+  float: right;
   padding: 1rem;
-  height: 100vh; /* Optional: Set to full viewport height */
+  height: 100vh;
   box-sizing: border-box;
-  border-left: 2px solid #ddd; /* Visual separation from the deals grid */
-  min-height: 500px; /* Ensure a minimum height */
-  min-width: 346px; /* Set a fixed minimum width */
-  max-height: 100vh; /* Set maximum height to viewport height */
-  overflow-y: auto; /* Enable scrolling within the element */
+  border-left: 2px solid #ddd;
+  min-height: 500px;
+  min-width: 346px;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
-.empty-state {
+.empty-state, .no-deals {
   text-align: center;
   padding: 2rem;
   color: #666;
-  height: 100%; /* Ensure it occupies the full height of its container */
-  width: 80%; /* Ensure it occupies the full width of its container */
-  overflow-y: hidden; /* Hide scrollbar */
-}
-
-.no-deals {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  height: 100%; /* Ensure it occupies the full height of its container */
-  width: 80%; /* Ensure it occupies the full width of its container */
-  overflow-y: hidden; /* Hide scrollbar */
+  height: 100%;
+  width: 80%;
+  overflow-y: hidden;
 }
 
 @media (max-width: 1600px) {
   .deals-grid, .filters-sidebar {
-    min-width: auto; /* Adjust widths for smaller screens */
-    width: 100%; /* Make both components full width on smaller screens */
+    min-width: auto;
+    width: 100%;
     float: none;
   }
 }
