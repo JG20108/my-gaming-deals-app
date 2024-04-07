@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchDeals } from '../../services/DealService';
-import SearchBar from '../molecules/SearchBar';
-import RangeFilterDual from '../molecules/RangeFilterDual';
 import DealsGrid from '../organisms/DealsGrid';
+import FiltersSidebar from '../organisms/FiltersSidebar';
 
 interface Deal {
   dealID: string;
@@ -22,18 +21,20 @@ const DealsPage: React.FC = () => {
   const [metacriticScoreFilter, setMetacriticScoreFilter] = useState<[number, number]>([0, 100]);
   const [salePriceRange, setSalePriceRange] = useState<[number, number]>([0, 10]);
   const [savingsFilter, setSavingsFilter] = useState<[number, number]>([0, 100]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
-    fetchDeals()
-      .then((deals: Deal[]) => {
+    fetchDeals(currentPage)
+      .then(({ deals, totalPageCount }) => {
         const sortedDeals = deals.sort((a: Deal, b: Deal) => Number(b.metacriticScore) - Number(a.metacriticScore));
-        console.log(sortedDeals); 
         setDeals(sortedDeals);
+        setTotalPages(totalPageCount ? parseInt(totalPageCount, 10) : 0);
       })
       .catch((error: Error) => {
         console.error('Failed to fetch deals:', error);
       });
-  }, []);
+  }, [currentPage]);
 
   const filteredDeals = deals
     .filter(deal => Number(deal.metacriticScore) >= metacriticScoreFilter[0] && Number(deal.metacriticScore) <= metacriticScoreFilter[1])
@@ -43,34 +44,17 @@ const DealsPage: React.FC = () => {
   return (
     <div>
       <DealsGrid deals={filteredDeals} />
-      <div className="filters-sidebar">
-        <SearchBar onSearch={(query) => console.log(query)} />
-        <RangeFilterDual
-          label="Metacritic Score"
-          min={0} 
-          max={100}
-          step={10}
-          value={metacriticScoreFilter}
-          onChange={(value: number[]) => setMetacriticScoreFilter([value[0], value[1]])}
-        />
-        <RangeFilterDual
-          label="Sale Price"
-          min={0}
-          max={100} 
-          step={10}
-          value={salePriceRange}
-          onChange={(value: number[]) => setSalePriceRange([value[0], value[1]])}
-        />
-        <RangeFilterDual
-          label="Savings"
-          min={0}
-          max={100}
-          step={10}
-          value={savingsFilter}
-          onChange={(value: number[]) => setSavingsFilter([value[0], value[1]])}
-        />
-        {/* Additional filters can be placed here */}
-      </div>
+      <FiltersSidebar
+        metacriticScoreFilter={metacriticScoreFilter}
+        setMetacriticScoreFilter={setMetacriticScoreFilter}
+        salePriceRange={salePriceRange}
+        setSalePriceRange={setSalePriceRange}
+        savingsFilter={savingsFilter}
+        setSavingsFilter={setSavingsFilter}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
