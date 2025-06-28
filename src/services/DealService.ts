@@ -12,9 +12,12 @@ const cache: { [key: string]: { data: DealsResponse; expiry: number } } = {};
 export const fetchDeals = async (
   pageNumber: number = 0,
   pageSize: number = 60,
-  upperPrice?: number
+  upperPrice?: number,
+  title?: string
 ): Promise<DealsResponse> => {
-  const cacheKey = `deals-${pageNumber}-${pageSize}-${upperPrice}`;
+  const cacheKey = `deals-${pageNumber}-${pageSize}-${upperPrice}-${
+    title || ''
+  }`;
   const now = new Date().getTime();
 
   // Log cache check
@@ -38,6 +41,10 @@ export const fetchDeals = async (
   if (upperPrice !== undefined) {
     url += `&upperPrice=${upperPrice}`;
   }
+  if (title && title.trim() !== '') {
+    // URL encode the title parameter for safe transmission
+    url += `&title=${encodeURIComponent(title.trim())}`;
+  }
 
   // Log request details
   console.log(`🌐 [DealService] Making API request to: ${url}`);
@@ -45,6 +52,7 @@ export const fetchDeals = async (
     pageNumber,
     pageSize,
     upperPrice,
+    title: title || 'none',
     storeID: 1,
   });
 
@@ -88,6 +96,7 @@ export const fetchDeals = async (
       length: Array.isArray(rawDeals) ? rawDeals.length : 'N/A',
       firstDeal:
         Array.isArray(rawDeals) && rawDeals.length > 0 ? rawDeals[0] : null,
+      searchTerm: title || 'none',
     });
 
     // Log sample of deals data structure

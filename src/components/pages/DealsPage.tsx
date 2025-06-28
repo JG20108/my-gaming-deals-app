@@ -34,12 +34,14 @@ const DealsPage: React.FC = () => {
   const [dealRatingFilter, setDealRatingFilter] = useState<[number, number]>([
     0, 10,
   ]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOption, setSortOption] = useState<SortOption>(DEFAULT_SORT_OPTION);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
-    fetchDeals(currentPage)
+    // Pass search query to fetchDeals for server-side search
+    fetchDeals(currentPage, 60, undefined, searchQuery.trim() || undefined)
       .then(({ deals, totalPageCount }) => {
         setDeals(deals);
         setTotalPages(totalPageCount ? parseInt(totalPageCount, 10) : 0);
@@ -47,7 +49,7 @@ const DealsPage: React.FC = () => {
       .catch((error: Error) => {
         console.error('Failed to fetch deals:', error);
       });
-  }, [currentPage]);
+  }, [currentPage, searchQuery]); // Add searchQuery as dependency
 
   // Check if any filters are active (not at default values)
   const areFiltersActive = () => {
@@ -61,6 +63,7 @@ const DealsPage: React.FC = () => {
       dealRatingFilter[0] !== 0 ||
       dealRatingFilter[1] !== 10
     );
+    // Note: searchQuery is NOT included here since it's handled server-side
   };
 
   const filteredDeals = deals
@@ -84,11 +87,20 @@ const DealsPage: React.FC = () => {
         Number(deal.dealRating) >= dealRatingFilter[0] &&
         Number(deal.dealRating) <= dealRatingFilter[1]
     );
+  // Removed client-side search filter since we now use server-side search
 
   const sortedAndFilteredDeals = sortDeals(filteredDeals, sortOption);
 
   const handleSortChange = (newSortOption: SortOption) => {
     setSortOption(newSortOption);
+  };
+
+  // Handle search query changes
+  const handleSearch = (query: string) => {
+    console.log('🔍 [Search] Search query:', query);
+    setSearchQuery(query);
+    // Reset to first page when searching
+    setCurrentPage(0);
   };
 
   // Clear all filters to default values
@@ -98,14 +110,16 @@ const DealsPage: React.FC = () => {
     setSalePriceRange([0, 10]);
     setSavingsFilter([0, 100]);
     setDealRatingFilter([0, 10]);
+    setSearchQuery(''); // Clear search query too
     // Note: We don't reset sortOption as sorting is separate from filtering
   };
 
   // Calculate pagination data based on filter state
-  const isFiltering = areFiltersActive();
+  const isFiltering = areFiltersActive(); // Only client-side filters count as "filtering"
+
   const paginationData = {
-    currentPage: isFiltering ? 0 : currentPage, // Reset to page 1 when filtering
-    totalPages: isFiltering ? 1 : totalPages, // Single page when filtering
+    currentPage: isFiltering ? 0 : currentPage, // Reset to page 1 when client-side filtering
+    totalPages: isFiltering ? 1 : totalPages, // Single page when client-side filtering, normal pagination for search
     filteredCount: filteredDeals.length,
     isFiltering: isFiltering,
     totalApiDeals: totalPages * 60, // Assuming 60 deals per page from API
@@ -134,6 +148,7 @@ const DealsPage: React.FC = () => {
         setDealRatingFilter={setDealRatingFilter}
         sortOption={sortOption}
         onSortChange={handleSortChange}
+        onSearch={handleSearch}
         currentPage={paginationData.currentPage}
         totalPages={paginationData.totalPages}
         onPageChange={setCurrentPage}

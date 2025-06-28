@@ -17,6 +17,7 @@ interface FiltersSidebarProps {
   setDealRatingFilter: React.Dispatch<React.SetStateAction<[number, number]>>;
   sortOption: SortOption;
   onSortChange: (sortOption: SortOption) => void;
+  onSearch: (query: string) => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -37,6 +38,7 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
   setDealRatingFilter,
   sortOption,
   onSortChange,
+  onSearch,
   currentPage,
   totalPages,
   onPageChange,
@@ -74,7 +76,7 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
 
   return (
     <div className="filters-sidebar">
-      <SearchBar onSearch={(query) => console.log(query)} />
+      <SearchBar onSearch={onSearch} />
 
       <SortControls sortOption={sortOption} onSortChange={onSortChange} />
 
