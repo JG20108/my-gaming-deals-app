@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit validation..."
+
+# Run TypeScript type checking
+echo "📋 Checking TypeScript types..."
+npm run type-check:strict
+
+# Run ESLint
+echo "🔧 Running ESLint..."
+npm run lint
+
+# Check for console.log statements
+echo "🚫 Checking for console.log statements..."
+if grep -r "console\.log" src/ --exclude-dir=node_modules; then
+  echo "❌ Found console.log statements. Please remove them before committing."
+  exit 1
+fi
+
+# Check for TODO/FIXME comments
+echo "📝 Checking for TODO/FIXME comments..."
+TODO_COUNT=$(grep -r "TODO\|FIXME" src/ --exclude-dir=node_modules | wc -l || echo "0")
+if [ "$TODO_COUNT" -gt 5 ]; then
+  echo "⚠️ Found $TODO_COUNT TODO/FIXME comments. Consider addressing some before committing."
+  grep -r "TODO\|FIXME" src/ --exclude-dir=node_modules
+fi
+
+echo "✅ Pre-commit validation passed!" 

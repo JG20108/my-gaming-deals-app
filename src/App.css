@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Press+Start+2P&display=swap');
 
 :root {
-  font-family: Orbitron, 'Press Start 2P', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Orbitron, 'Press Start 2P', system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
@@ -111,7 +112,8 @@ button:focus-visible {
   overflow-y: auto;
 }
 
-.empty-state, .no-deals {
+.empty-state,
+.no-deals {
   text-align: center;
   padding: 2rem;
   color: #666;
@@ -120,8 +122,64 @@ button:focus-visible {
   overflow-y: hidden;
 }
 
+/* Pagination Controls Styles */
+.pagination-controls {
+  margin-top: 20px;
+}
+
+.page-info {
+  margin: 10px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-family: Orbitron, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.pagination-buttons {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.pagination-btn {
+  margin: 0 2px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: Orbitron, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.87);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #646cff;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn.active {
+  background-color: #646cff;
+  color: white;
+  font-weight: bold;
+}
+
+.pagination-ellipsis {
+  margin: 0 2px;
+  padding: 8px 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: Orbitron, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
 @media (max-width: 1600px) {
-  .deals-grid, .filters-sidebar {
+  .deals-grid,
+  .filters-sidebar {
     min-width: auto;
     width: 100%;
     float: none;

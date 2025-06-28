@@ -1,34 +1,173 @@
-// import axios from 'axios';
-import { Deal } from '../types';
-// const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL;
+/**
+ * Service for fetching gaming deals from CheapShark API
+ * Implements caching with TTL to optimize performance and reduce API calls
+ * Follows Single Responsibility Principle - handles only data fetching logic
+ */
 
+import { Deal } from '../types';
+
+// TypeScript interfaces for type safety
 interface DealsResponse {
   deals: Deal[];
-  totalPageCount: string | null;
+  totalPageCount: number;
 }
 
-const cache: { [key: string]: { data: DealsResponse; expiry: number } } = {};
+interface RawDeal {
+  dealID: string;
+  title: string;
+  salePrice: string;
+  normalPrice: string;
+  savings: string;
+  thumb: string;
+  metacriticScore: string;
+  metacriticLink: string;
+  steamRatingText: string | null;
+  steamAppID: string;
+  dealRating: string;
+}
 
-export const fetchDeals = async (pageNumber: number = 0, pageSize: number = 60, upperPrice?: number): Promise<DealsResponse> => {
-  const cacheKey = `deals-${pageNumber}-${pageSize}-${upperPrice}`;
-  const now = new Date().getTime();
-  if (cache[cacheKey] && cache[cacheKey].expiry > now) {
-    return cache[cacheKey].data;
-  }
+// Simple in-memory cache with TTL
+const cache = new Map<string, { data: DealsResponse; expiry: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  let url = `https://www.cheapshark.com/api/1.0/deals?storeID=1&pageNumber=${pageNumber}&pageSize=${pageSize}`;
-  if (upperPrice !== undefined) {
-    url += `&upperPrice=${upperPrice}`;
+/**
+ * Generic cache check function
+ * @param key - Cache key to check
+ * @returns Cached data if valid, null if expired or not found
+ */
+const getCachedData = (key: string): DealsResponse | null => {
+  const cached = cache.get(key);
+  if (cached && cached.expiry > Date.now()) {
+    return cached.data;
   }
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
+  if (cached) {
+    cache.delete(key); // Clean up expired cache
   }
-  const totalPageCount = response.headers.get('X-Total-Page-Count');
-  const data = { deals: await response.json(), totalPageCount };
-
-  // Cache the data for 5 minutes (300000 milliseconds)
-  cache[cacheKey] = { data, expiry: now + 300000 };
-  return data;
+  return null;
 };
 
+/**
+ * Cache data with TTL
+ * @param key - Cache key
+ * @param data - Data to cache
+ */
+const setCachedData = (key: string, data: DealsResponse): void => {
+  cache.set(key, {
+    data,
+    expiry: Date.now() + CACHE_TTL,
+  });
+};
+
+interface FetchDealsParams {
+  pageNumber?: number;
+  pageSize?: number;
+  upperPrice?: number;
+  lowerPrice?: number;
+  metacritic?: number;
+  sortBy?: string;
+  desc?: boolean;
+  title?: string;
+}
+
+/**
+ * Fetches deals from CheapShark API with caching and server-side filtering/sorting
+ * @param params - API parameters for filtering, sorting, and pagination
+ * @returns Promise containing deals array and total page count
+ */
+export const fetchDeals = async (
+  params: FetchDealsParams = {}
+): Promise<DealsResponse> => {
+  const {
+    pageNumber = 0,
+    pageSize = 60,
+    upperPrice,
+    lowerPrice,
+    metacritic,
+    sortBy,
+    desc,
+    title,
+  } = params;
+
+  // Create cache key based on all parameters
+  const cacheKey = `deals-${pageNumber}-${pageSize}-${upperPrice}-${lowerPrice}-${metacritic}-${sortBy}-${desc}-${
+    title || 'none'
+  }`;
+
+  // Check cache first
+  const cachedData = getCachedData(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  try {
+    // Build API URL with parameters
+    const baseUrl = 'https://www.cheapshark.com/api/1.0/deals';
+    const urlParams = new URLSearchParams({
+      storeID: '1', // Steam only for now
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+      onSale: 'true', // Only show deals with actual discounts
+    });
+
+    // Add optional parameters only if they have valid values
+    if (upperPrice !== undefined && upperPrice > 0) {
+      urlParams.append('upperPrice', upperPrice.toString());
+    }
+    if (lowerPrice !== undefined && lowerPrice > 0) {
+      urlParams.append('lowerPrice', lowerPrice.toString());
+    }
+    if (metacritic !== undefined && metacritic > 0) {
+      urlParams.append('metacritic', metacritic.toString());
+    }
+    if (sortBy) {
+      urlParams.append('sortBy', sortBy);
+    }
+    if (desc !== undefined) {
+      urlParams.append('desc', desc ? '1' : '0');
+    }
+    if (title && title !== 'none') {
+      urlParams.append('title', title);
+    }
+
+    const url = `${baseUrl}?${urlParams.toString()}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Get total page count from response headers
+    const totalPageCount = response.headers.get('X-Total-Page-Count');
+
+    const rawDeals = (await response.json()) as RawDeal[];
+
+    // Transform the API response to match our interface
+    const deals: Deal[] = rawDeals.map((deal: RawDeal) => ({
+      dealID: deal.dealID,
+      title: deal.title,
+      salePrice: deal.salePrice,
+      normalPrice: deal.normalPrice,
+      savings: deal.savings,
+      thumb: deal.thumb,
+      metacriticScore: deal.metacriticScore,
+      metacriticLink: deal.metacriticLink,
+      steamRatingText: deal.steamRatingText,
+      steamAppID: deal.steamAppID,
+      dealRating: deal.dealRating,
+    }));
+
+    const result: DealsResponse = {
+      deals,
+      totalPageCount: totalPageCount ? parseInt(totalPageCount, 10) : 1,
+    };
+
+    // Cache the result
+    setCachedData(cacheKey, result);
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching deals:', error);
+    throw error;
+  }
+};
