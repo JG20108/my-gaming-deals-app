@@ -46,7 +46,7 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
       label="Metacritic Score"
       min={0}
       max={100}
-      step={10}
+      step={1}
       value={metacriticScoreFilter}
       onChange={(value: number[]) =>
         setMetacriticScoreFilter([value[0], value[1]])
@@ -56,7 +56,7 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
       label="Sale Price"
       min={0}
       max={100}
-      step={10}
+      step={1}
       value={salePriceRange}
       onChange={(value: number[]) => setSalePriceRange([value[0], value[1]])}
     />
@@ -64,7 +64,7 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
       label="Savings"
       min={0}
       max={100}
-      step={10}
+      step={1}
       value={savingsFilter}
       onChange={(value: number[]) => setSavingsFilter([value[0], value[1]])}
     />
