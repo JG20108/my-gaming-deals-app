@@ -1,6 +1,6 @@
 import React from 'react';
 import DealCard from '../molecules/DealCard';
-import { Deal } from '../../types'; 
+import { Deal } from '../../types';
 
 interface DealsGridProps {
   deals: Deal[];
@@ -8,7 +8,9 @@ interface DealsGridProps {
 
 const DealsGrid: React.FC<DealsGridProps> = ({ deals }) => {
   return (
-    <div className={`deals-grid ${deals.length > 0 ? "has-deals" : "no-deals"}`}>
+    <div
+      className={`deals-grid ${deals.length > 0 ? 'has-deals' : 'no-deals'}`}
+    >
       {deals.length > 0 ? (
         deals.map((deal) => (
           <DealCard
@@ -22,6 +24,7 @@ const DealsGrid: React.FC<DealsGridProps> = ({ deals }) => {
             metacriticLink={deal.metacriticLink}
             steamRatingText={deal.steamRatingText}
             steamAppID={deal.steamAppID}
+            dealRating={deal.dealRating}
           />
         ))
       ) : (

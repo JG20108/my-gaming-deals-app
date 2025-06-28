@@ -10,6 +10,7 @@ interface DealCardProps {
   metacriticLink: string; // New
   steamRatingText: string; // New
   steamAppID: string; // New
+  dealRating: string;
 }
 
 const DealCard: React.FC<DealCardProps> = ({
@@ -22,6 +23,7 @@ const DealCard: React.FC<DealCardProps> = ({
   metacriticLink,
   steamRatingText,
   steamAppID, // New
+  dealRating,
 }) => (
   <div className="deal-card">
     <img src={thumb} alt={title} className="deal-image" />
@@ -30,8 +32,24 @@ const DealCard: React.FC<DealCardProps> = ({
     <p>Normal Price: ${normalPrice}</p>
     <p>You Save: {savings}%</p>
     <p>Steam Rating: {steamRatingText}</p>
-    <p title={`Metacritic Score: ${metacriticScore}`}>Metacritic: <a href={`https://www.metacritic.com${metacriticLink}`} target="_blank" rel="noopener noreferrer">{metacriticScore}</a></p>
-    <a href={`https://store.steampowered.com/app/${steamAppID}`} target="_blank" rel="noopener noreferrer">View on Steam</a>
+    <p>Deal Rating: {dealRating}/10</p>
+    <p title={`Metacritic Score: ${metacriticScore}`}>
+      Metacritic:{' '}
+      <a
+        href={`https://www.metacritic.com${metacriticLink}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {metacriticScore}
+      </a>
+    </p>
+    <a
+      href={`https://store.steampowered.com/app/${steamAppID}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View on Steam
+    </a>
   </div>
 );
 
