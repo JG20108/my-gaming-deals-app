@@ -49,6 +49,20 @@ const DealsPage: React.FC = () => {
       });
   }, [currentPage]);
 
+  // Check if any filters are active (not at default values)
+  const areFiltersActive = () => {
+    return (
+      metacriticScoreFilter[0] !== 0 ||
+      metacriticScoreFilter[1] !== 100 ||
+      salePriceRange[0] !== 0 ||
+      salePriceRange[1] !== 10 ||
+      savingsFilter[0] !== 0 ||
+      savingsFilter[1] !== 100 ||
+      dealRatingFilter[0] !== 0 ||
+      dealRatingFilter[1] !== 10
+    );
+  };
+
   const filteredDeals = deals
     .filter(
       (deal) =>
@@ -77,6 +91,26 @@ const DealsPage: React.FC = () => {
     setSortOption(newSortOption);
   };
 
+  // Clear all filters to default values
+  const handleClearFilters = () => {
+    console.log('🔄 [Filters] Clearing all filters to default values');
+    setMetacriticScoreFilter([0, 100]);
+    setSalePriceRange([0, 10]);
+    setSavingsFilter([0, 100]);
+    setDealRatingFilter([0, 10]);
+    // Note: We don't reset sortOption as sorting is separate from filtering
+  };
+
+  // Calculate pagination data based on filter state
+  const isFiltering = areFiltersActive();
+  const paginationData = {
+    currentPage: isFiltering ? 0 : currentPage, // Reset to page 1 when filtering
+    totalPages: isFiltering ? 1 : totalPages, // Single page when filtering
+    filteredCount: filteredDeals.length,
+    isFiltering: isFiltering,
+    totalApiDeals: totalPages * 60, // Assuming 60 deals per page from API
+  };
+
   return (
     <div>
       <DealsHeader
@@ -100,9 +134,13 @@ const DealsPage: React.FC = () => {
         setDealRatingFilter={setDealRatingFilter}
         sortOption={sortOption}
         onSortChange={handleSortChange}
-        currentPage={currentPage}
-        totalPages={totalPages}
+        currentPage={paginationData.currentPage}
+        totalPages={paginationData.totalPages}
         onPageChange={setCurrentPage}
+        filteredCount={paginationData.filteredCount}
+        isFiltering={paginationData.isFiltering}
+        totalApiDeals={paginationData.totalApiDeals}
+        onClearFilters={handleClearFilters}
       />
     </div>
   );

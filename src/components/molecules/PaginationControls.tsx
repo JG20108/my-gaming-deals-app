@@ -4,12 +4,18 @@ interface PaginationControlsProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  filteredCount: number;
+  isFiltering: boolean;
+  totalApiDeals: number;
 }
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  filteredCount,
+  isFiltering,
+  totalApiDeals,
 }) => {
   const handlePageChange = (newPage: number, source: string) => {
     console.log(
@@ -115,7 +121,11 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     <div style={{ marginTop: '20px' }}>
       {/* Page Information */}
       <div style={pageInfoStyle}>
-        Page {currentPage + 1} of {totalPages} ({totalPages * 60} total deals)
+        {isFiltering
+          ? `Showing ${filteredCount} filtered deals (from ${totalApiDeals} total)`
+          : `Page ${
+              currentPage + 1
+            } of ${totalPages} (${totalApiDeals} total deals)`}
       </div>
 
       {/* Navigation Controls */}
@@ -123,9 +133,13 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         {/* First Page Button */}
         <button
           onClick={() => handlePageChange(0, 'First page button')}
-          disabled={currentPage <= 0}
+          disabled={currentPage <= 0 || isFiltering}
           style={buttonStyle}
-          title="Go to first page"
+          title={
+            isFiltering
+              ? 'Pagination disabled while filtering'
+              : 'Go to first page'
+          }
         >
           ««
         </button>
@@ -133,47 +147,56 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         {/* Previous Button */}
         <button
           onClick={() => handlePageChange(currentPage - 1, 'Previous button')}
-          disabled={currentPage <= 0}
+          disabled={currentPage <= 0 || isFiltering}
           style={buttonStyle}
-          title="Go to previous page"
+          title={
+            isFiltering
+              ? 'Pagination disabled while filtering'
+              : 'Go to previous page'
+          }
         >
           ‹ Prev
         </button>
 
         {/* Page Numbers */}
-        {pageNumbers.map((pageNum, index) => {
-          if (pageNum === '...') {
+        {!isFiltering &&
+          pageNumbers.map((pageNum, index) => {
+            if (pageNum === '...') {
+              return (
+                <span key={`ellipsis-${index}`} style={ellipsisStyle}>
+                  ...
+                </span>
+              );
+            }
+
+            const pageIndex = (pageNum as number) - 1; // Convert back to 0-based
+            const isActive = currentPage === pageIndex;
+
             return (
-              <span key={`ellipsis-${index}`} style={ellipsisStyle}>
-                ...
-              </span>
+              <button
+                key={pageNum}
+                onClick={() =>
+                  handlePageChange(pageIndex, `Page ${pageNum} button`)
+                }
+                disabled={isActive}
+                style={isActive ? activeButtonStyle : buttonStyle}
+                title={`Go to page ${pageNum}`}
+              >
+                {pageNum}
+              </button>
             );
-          }
-
-          const pageIndex = (pageNum as number) - 1; // Convert back to 0-based
-          const isActive = currentPage === pageIndex;
-
-          return (
-            <button
-              key={pageNum}
-              onClick={() =>
-                handlePageChange(pageIndex, `Page ${pageNum} button`)
-              }
-              disabled={isActive}
-              style={isActive ? activeButtonStyle : buttonStyle}
-              title={`Go to page ${pageNum}`}
-            >
-              {pageNum}
-            </button>
-          );
-        })}
+          })}
 
         {/* Next Button */}
         <button
           onClick={() => handlePageChange(currentPage + 1, 'Next button')}
-          disabled={currentPage >= totalPages - 1}
+          disabled={currentPage >= totalPages - 1 || isFiltering}
           style={buttonStyle}
-          title="Go to next page"
+          title={
+            isFiltering
+              ? 'Pagination disabled while filtering'
+              : 'Go to next page'
+          }
         >
           Next ›
         </button>
@@ -181,9 +204,13 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         {/* Last Page Button */}
         <button
           onClick={() => handlePageChange(totalPages - 1, 'Last page button')}
-          disabled={currentPage >= totalPages - 1}
+          disabled={currentPage >= totalPages - 1 || isFiltering}
           style={buttonStyle}
-          title="Go to last page"
+          title={
+            isFiltering
+              ? 'Pagination disabled while filtering'
+              : 'Go to last page'
+          }
         >
           »»
         </button>
