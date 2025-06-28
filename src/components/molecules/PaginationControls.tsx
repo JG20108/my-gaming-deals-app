@@ -4,74 +4,78 @@ interface PaginationControlsProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  filteredCount: number;
-  isFiltering: boolean;
-  totalApiDeals: number;
+  filteredCount?: number;
+  isFiltering?: boolean;
+  totalApiDeals?: number;
 }
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  filteredCount,
-  isFiltering,
-  totalApiDeals,
+  filteredCount = 0,
+  isFiltering = false,
+  totalApiDeals = 0,
 }) => {
-  const handlePageChange = (newPage: number, source: string) => {
-    console.log(
-      `🔢 [Pagination] ${source} clicked - changing from page ${currentPage} to page ${newPage}`
-    );
-    onPageChange(newPage);
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 0 && newPage < totalPages && !isFiltering) {
+      onPageChange(newPage);
+    }
   };
 
-  // Enhanced pagination logic with better page visibility
+  // Generate page numbers with ellipsis for large page counts
   const generatePageNumbers = () => {
     const pages: (number | string)[] = [];
-    const currentPageDisplay = currentPage + 1; // Convert to 1-based for display
+    const maxVisiblePages = 7;
 
-    if (totalPages <= 7) {
-      // Show all pages if 7 or fewer
-      for (let i = 1; i <= totalPages; i++) {
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is small
+      for (let i = 0; i < totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show first page
-      pages.push(1);
+      // Complex logic for ellipsis
+      const startPages = 2; // Always show first 2 pages
+      const endPages = 2; // Always show last 2 pages
+      const middlePages = 3; // Show 3 pages around current
 
-      if (currentPageDisplay > 4) {
-        // Add ellipsis if current page is far from start
-        pages.push('...');
-      }
-
-      // Calculate range around current page
-      let startRange = Math.max(2, currentPageDisplay - 1);
-      let endRange = Math.min(totalPages - 1, currentPageDisplay + 1);
-
-      // Adjust range if we're near the beginning
-      if (currentPageDisplay <= 4) {
-        startRange = 2;
-        endRange = Math.min(6, totalPages - 1);
-      }
-
-      // Adjust range if we're near the end
-      if (currentPageDisplay >= totalPages - 3) {
-        startRange = Math.max(2, totalPages - 5);
-        endRange = totalPages - 1;
-      }
-
-      // Add the range pages
-      for (let i = startRange; i <= endRange; i++) {
+      // Always include first pages
+      for (let i = 0; i < startPages && i < totalPages; i++) {
         pages.push(i);
       }
 
-      if (currentPageDisplay < totalPages - 3) {
-        // Add ellipsis if current page is far from end
+      // Calculate middle range
+      const middleStart = Math.max(
+        startPages,
+        currentPage - Math.floor(middlePages / 2)
+      );
+      const middleEnd = Math.min(
+        totalPages - endPages,
+        currentPage + Math.floor(middlePages / 2)
+      );
+
+      // Add ellipsis before middle if needed
+      if (middleStart > startPages) {
         pages.push('...');
       }
 
-      // Always show last page (if more than 1 page total)
-      if (totalPages > 1) {
-        pages.push(totalPages);
+      // Add middle pages
+      for (let i = middleStart; i <= middleEnd; i++) {
+        if (i >= startPages && i < totalPages - endPages) {
+          pages.push(i);
+        }
+      }
+
+      // Add ellipsis after middle if needed
+      if (middleEnd < totalPages - endPages - 1) {
+        pages.push('...');
+      }
+
+      // Always include last pages
+      for (let i = totalPages - endPages; i < totalPages; i++) {
+        if (i >= 0) {
+          pages.push(i);
+        }
       }
     }
 
@@ -80,136 +84,92 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 
   const pageNumbers = generatePageNumbers();
 
-  console.log(
-    '🔢 [Pagination] Rendering - currentPage:',
-    currentPage,
-    'totalPages:',
-    totalPages
-  );
-
-  const buttonStyle: React.CSSProperties = {
-    margin: '0 2px',
-    padding: '8px 12px',
-    fontSize: '14px',
-    fontFamily: 'Orbitron, system-ui, Avenir, Helvetica, Arial, sans-serif',
-  };
-
-  const activeButtonStyle: React.CSSProperties = {
-    ...buttonStyle,
-    backgroundColor: '#646cff',
-    color: 'white',
-    fontWeight: 'bold',
-  };
-
-  const ellipsisStyle: React.CSSProperties = {
-    margin: '0 2px',
-    padding: '8px 4px',
-    fontSize: '14px',
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontFamily: 'Orbitron, system-ui, Avenir, Helvetica, Arial, sans-serif',
-  };
-
-  const pageInfoStyle: React.CSSProperties = {
-    margin: '10px 0',
-    fontSize: '14px',
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    fontFamily: 'Orbitron, system-ui, Avenir, Helvetica, Arial, sans-serif',
-  };
-
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div className="pagination-controls">
       {/* Page Information */}
-      <div style={pageInfoStyle}>
-        {isFiltering
-          ? `Showing ${filteredCount} filtered deals (from ${totalApiDeals} total)`
-          : `Page ${
-              currentPage + 1
-            } of ${totalPages} (${totalApiDeals} total deals)`}
+      <div className="page-info">
+        {isFiltering ? (
+          <span>
+            Showing {filteredCount} filtered deals (from {totalApiDeals} total)
+          </span>
+        ) : (
+          <span>
+            Page {currentPage + 1} of {totalPages} ({totalApiDeals} total deals)
+          </span>
+        )}
       </div>
 
-      {/* Navigation Controls */}
-      <div style={{ textAlign: 'center', marginTop: '10px' }}>
-        {/* First Page Button */}
+      {/* Navigation Buttons */}
+      <div className="pagination-buttons">
+        {/* First Page */}
         <button
-          onClick={() => handlePageChange(0, 'First page button')}
-          disabled={currentPage <= 0 || isFiltering}
-          style={buttonStyle}
+          onClick={() => handlePageChange(0)}
+          disabled={currentPage === 0 || isFiltering}
+          className="pagination-btn first"
           title={
-            isFiltering
-              ? 'Pagination disabled while filtering'
-              : 'Go to first page'
+            isFiltering ? 'Pagination disabled while filtering' : 'First page'
           }
         >
           ««
         </button>
 
-        {/* Previous Button */}
+        {/* Previous Page */}
         <button
-          onClick={() => handlePageChange(currentPage - 1, 'Previous button')}
-          disabled={currentPage <= 0 || isFiltering}
-          style={buttonStyle}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 0 || isFiltering}
+          className="pagination-btn prev"
           title={
             isFiltering
               ? 'Pagination disabled while filtering'
-              : 'Go to previous page'
+              : 'Previous page'
           }
         >
-          ‹ Prev
+          ‹
         </button>
 
         {/* Page Numbers */}
-        {!isFiltering &&
-          pageNumbers.map((pageNum, index) => {
-            if (pageNum === '...') {
-              return (
-                <span key={`ellipsis-${index}`} style={ellipsisStyle}>
-                  ...
-                </span>
-              );
-            }
-
-            const pageIndex = (pageNum as number) - 1; // Convert back to 0-based
-            const isActive = currentPage === pageIndex;
-
-            return (
+        {pageNumbers.map((page, index) => (
+          <span key={index}>
+            {typeof page === 'number' ? (
               <button
-                key={pageNum}
-                onClick={() =>
-                  handlePageChange(pageIndex, `Page ${pageNum} button`)
+                onClick={() => handlePageChange(page)}
+                disabled={isFiltering}
+                className={`pagination-btn page-number ${
+                  currentPage === page ? 'active' : ''
+                }`}
+                title={
+                  isFiltering
+                    ? 'Pagination disabled while filtering'
+                    : `Go to page ${page + 1}`
                 }
-                disabled={isActive}
-                style={isActive ? activeButtonStyle : buttonStyle}
-                title={`Go to page ${pageNum}`}
               >
-                {pageNum}
+                {page + 1}
               </button>
-            );
-          })}
+            ) : (
+              <span className="pagination-ellipsis">{page}</span>
+            )}
+          </span>
+        ))}
 
-        {/* Next Button */}
+        {/* Next Page */}
         <button
-          onClick={() => handlePageChange(currentPage + 1, 'Next button')}
+          onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage >= totalPages - 1 || isFiltering}
-          style={buttonStyle}
+          className="pagination-btn next"
           title={
-            isFiltering
-              ? 'Pagination disabled while filtering'
-              : 'Go to next page'
+            isFiltering ? 'Pagination disabled while filtering' : 'Next page'
           }
         >
-          Next ›
+          ›
         </button>
 
-        {/* Last Page Button */}
+        {/* Last Page */}
         <button
-          onClick={() => handlePageChange(totalPages - 1, 'Last page button')}
+          onClick={() => handlePageChange(totalPages - 1)}
           disabled={currentPage >= totalPages - 1 || isFiltering}
-          style={buttonStyle}
+          className="pagination-btn last"
           title={
-            isFiltering
-              ? 'Pagination disabled while filtering'
-              : 'Go to last page'
+            isFiltering ? 'Pagination disabled while filtering' : 'Last page'
           }
         >
           »»

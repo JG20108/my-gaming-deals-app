@@ -47,19 +47,19 @@ const DealsPage: React.FC = () => {
       metacriticScoreFilter[0] > 0 ? metacriticScoreFilter[0] : undefined;
     const { sortBy, desc } = mapSortToAPI(sortOption);
 
-    fetchDeals(
-      currentPage,
-      60,
+    fetchDeals({
+      pageNumber: currentPage,
+      pageSize: 60,
       upperPrice,
-      searchQuery.trim() || undefined,
+      title: searchQuery.trim() || undefined,
       lowerPrice,
-      minMetacritic,
+      metacritic: minMetacritic,
       sortBy,
-      desc
-    )
+      desc,
+    })
       .then(({ deals, totalPageCount }) => {
         setDeals(deals);
-        setTotalPages(totalPageCount ? parseInt(totalPageCount, 10) : 0);
+        setTotalPages(totalPageCount);
       })
       .catch((error: Error) => {
         console.error('Failed to fetch deals:', error);
@@ -107,21 +107,20 @@ const DealsPage: React.FC = () => {
 
   // Handle search query changes
   const handleSearch = (query: string) => {
-    console.log('🔍 [Search] Search query:', query);
     setSearchQuery(query);
-    // Reset to first page when searching
-    setCurrentPage(0);
+    setCurrentPage(0); // Reset to first page when searching
   };
 
   // Clear all filters to default values
   const handleClearFilters = () => {
-    console.log('🔄 [Filters] Clearing all filters to default values');
+    // Reset all filters to their default values
     setMetacriticScoreFilter([0, 100]);
-    setSalePriceRange([0, 10]);
+    setSalePriceRange([0, 50]);
     setSavingsFilter([0, 100]);
     setDealRatingFilter([0, 10]);
-    setSearchQuery(''); // Clear search query too
-    // Note: We don't reset sortOption as sorting is separate from filtering
+    setSortOption(DEFAULT_SORT_OPTION);
+    setSearchQuery('');
+    setCurrentPage(0);
   };
 
   // Calculate pagination data based on filter state
