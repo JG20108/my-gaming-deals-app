@@ -6,7 +6,18 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
 }
 
-const PaginationControls: React.FC<PaginationControlsProps> = ({ currentPage, totalPages, onPageChange }) => {
+const PaginationControls: React.FC<PaginationControlsProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
+  const handlePageChange = (newPage: number, source: string) => {
+    console.log(
+      `🔢 [Pagination] ${source} clicked - changing from page ${currentPage} to page ${newPage}`
+    );
+    onPageChange(newPage);
+  };
+
   let startPage: number, endPage: number;
 
   if (totalPages <= 5) {
@@ -27,21 +38,31 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({ currentPage, to
     }
   }
 
-  const pageNumbers = Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
+  const pageNumbers = Array.from(
+    { length: endPage - startPage + 1 },
+    (_, i) => startPage + i
+  );
+
+  console.log(
+    '🔢 [Pagination] Rendering - currentPage:',
+    currentPage,
+    'totalPages:',
+    totalPages
+  );
 
   return (
     <div style={{ marginTop: '20px' }}>
       <button
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => handlePageChange(currentPage - 1, 'Previous button')}
         disabled={currentPage <= 0}
         style={{ margin: '0 2px' }}
       >
         Previous
       </button>
-      {pageNumbers.map(number => (
+      {pageNumbers.map((number) => (
         <button
           key={number}
-          onClick={() => onPageChange(number - 1)}
+          onClick={() => handlePageChange(number - 1, `Page ${number} button`)}
           disabled={currentPage === number - 1}
           style={{ margin: '0 2px' }}
         >
@@ -49,7 +70,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({ currentPage, to
         </button>
       ))}
       <button
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => handlePageChange(currentPage + 1, 'Next button')}
         disabled={currentPage >= totalPages - 1}
         style={{ margin: '0 2px' }}
       >
