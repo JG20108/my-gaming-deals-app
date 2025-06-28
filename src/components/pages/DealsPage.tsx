@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchDeals } from '../../services/DealService';
 import DealsGrid from '../organisms/DealsGrid';
 import FiltersSidebar from '../organisms/FiltersSidebar';
+import DealsHeader from '../organisms/DealsHeader';
 import { SortOption } from '../molecules/SortControls';
 import { sortDeals, DEFAULT_SORT_OPTION } from '../../utils/sortUtils';
 
@@ -78,7 +79,16 @@ const DealsPage: React.FC = () => {
 
   return (
     <div>
+      <DealsHeader
+        metacriticScoreFilter={metacriticScoreFilter}
+        salePriceRange={salePriceRange}
+        savingsFilter={savingsFilter}
+        dealRatingFilter={dealRatingFilter}
+        sortOption={sortOption}
+      />
+
       <DealsGrid deals={sortedAndFilteredDeals} />
+
       <FiltersSidebar
         metacriticScoreFilter={metacriticScoreFilter}
         setMetacriticScoreFilter={setMetacriticScoreFilter}
