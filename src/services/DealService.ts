@@ -13,11 +13,15 @@ export const fetchDeals = async (
   pageNumber: number = 0,
   pageSize: number = 60,
   upperPrice?: number,
-  title?: string
+  title?: string,
+  lowerPrice?: number,
+  metacritic?: number,
+  sortBy?: string,
+  desc?: boolean
 ): Promise<DealsResponse> => {
   const cacheKey = `deals-${pageNumber}-${pageSize}-${upperPrice}-${
     title || ''
-  }`;
+  }-${lowerPrice || ''}-${metacritic || ''}-${sortBy || ''}-${desc || ''}`;
   const now = new Date().getTime();
 
   // Log cache check
@@ -41,6 +45,18 @@ export const fetchDeals = async (
   if (upperPrice !== undefined) {
     url += `&upperPrice=${upperPrice}`;
   }
+  if (lowerPrice !== undefined) {
+    url += `&lowerPrice=${lowerPrice}`;
+  }
+  if (metacritic !== undefined && metacritic > 0) {
+    url += `&metacritic=${metacritic}`;
+  }
+  if (sortBy && sortBy.trim() !== '') {
+    url += `&sortBy=${encodeURIComponent(sortBy)}`;
+  }
+  if (desc !== undefined) {
+    url += `&desc=${desc ? '1' : '0'}`;
+  }
   if (title && title.trim() !== '') {
     // URL encode the title parameter for safe transmission
     url += `&title=${encodeURIComponent(title.trim())}`;
@@ -52,6 +68,10 @@ export const fetchDeals = async (
     pageNumber,
     pageSize,
     upperPrice,
+    lowerPrice,
+    metacritic,
+    sortBy: sortBy || 'none',
+    desc,
     title: title || 'none',
     storeID: 1,
   });

@@ -58,3 +58,32 @@ export const DEFAULT_SORT_OPTION: SortOption = {
   field: 'dealRating',
   direction: 'desc',
 };
+
+/**
+ * Maps our internal sort options to CheapShark API sort parameters
+ * Enables server-side sorting for better performance
+ *
+ * @param sortOption - Our internal sort configuration
+ * @returns Object with sortBy and desc parameters for the API
+ */
+export const mapSortToAPI = (
+  sortOption: SortOption
+): { sortBy?: string; desc?: boolean } => {
+  const { field, direction } = sortOption;
+
+  // Map our field names to CheapShark API sort values
+  const apiSortMap: { [key in SortField]: string } = {
+    dealRating: 'Deal Rating',
+    metacriticScore: 'Metacritic',
+    salePrice: 'Price',
+    savings: 'Savings',
+  };
+
+  const sortBy = apiSortMap[field];
+  // Fix: CheapShark API interprets desc parameter inversely
+  // When user wants "High to Low" (desc), API needs desc=false
+  // When user wants "Low to High" (asc), API needs desc=true
+  const desc = direction === 'asc';
+
+  return { sortBy, desc };
+};

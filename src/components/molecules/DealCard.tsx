@@ -10,7 +10,7 @@ interface DealCardProps {
   thumb: string;
   metacriticScore: string;
   metacriticLink: string;
-  steamRatingText: string;
+  steamRatingText: string | null;
   steamAppID: string;
   dealRating: string;
 }
@@ -28,7 +28,12 @@ const DealCard: React.FC<DealCardProps> = ({
   dealRating,
 }) => {
   // Function to get Steam rating color based on rating text
-  const getSteamRatingColor = (ratingText: string): string => {
+  const getSteamRatingColor = (ratingText: string | null): string => {
+    // Handle null or empty rating text
+    if (!ratingText) {
+      return 'rgba(255, 255, 255, 0.7)'; // Default gray for missing ratings
+    }
+
     const rating = ratingText.toLowerCase();
 
     // Steam rating color mapping - order matters for specificity
@@ -216,7 +221,9 @@ const DealCard: React.FC<DealCardProps> = ({
       </p>
       <p style={ratingTextStyle}>
         <strong>Steam Rating:</strong>{' '}
-        <span style={steamRatingTextStyle}>{steamRatingText}</span>
+        <span style={steamRatingTextStyle}>
+          {steamRatingText || 'Not Available'}
+        </span>
       </p>
       <p style={ratingTextStyle}>
         <strong>Deal Rating:</strong> {dealRating}/10

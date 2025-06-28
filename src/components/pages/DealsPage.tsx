@@ -4,7 +4,7 @@ import DealsGrid from '../organisms/DealsGrid';
 import FiltersSidebar from '../organisms/FiltersSidebar';
 import DealsHeader from '../organisms/DealsHeader';
 import { SortOption } from '../molecules/SortControls';
-import { sortDeals, DEFAULT_SORT_OPTION } from '../../utils/sortUtils';
+import { DEFAULT_SORT_OPTION, mapSortToAPI } from '../../utils/sortUtils';
 
 interface Deal {
   dealID: string;
@@ -40,8 +40,23 @@ const DealsPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
-    // Pass search query to fetchDeals for server-side search
-    fetchDeals(currentPage, 60, undefined, searchQuery.trim() || undefined)
+    // Pass search query, price range, metacritic score, and sort options to fetchDeals for server-side filtering and sorting
+    const lowerPrice = salePriceRange[0] > 0 ? salePriceRange[0] : undefined;
+    const upperPrice = salePriceRange[1] < 10 ? salePriceRange[1] : undefined;
+    const minMetacritic =
+      metacriticScoreFilter[0] > 0 ? metacriticScoreFilter[0] : undefined;
+    const { sortBy, desc } = mapSortToAPI(sortOption);
+
+    fetchDeals(
+      currentPage,
+      60,
+      upperPrice,
+      searchQuery.trim() || undefined,
+      lowerPrice,
+      minMetacritic,
+      sortBy,
+      desc
+    )
       .then(({ deals, totalPageCount }) => {
         setDeals(deals);
         setTotalPages(totalPageCount ? parseInt(totalPageCount, 10) : 0);
@@ -49,34 +64,28 @@ const DealsPage: React.FC = () => {
       .catch((error: Error) => {
         console.error('Failed to fetch deals:', error);
       });
-  }, [currentPage, searchQuery]); // Add searchQuery as dependency
+  }, [
+    currentPage,
+    searchQuery,
+    salePriceRange,
+    metacriticScoreFilter,
+    sortOption,
+  ]); // Add sortOption as dependency
 
   // Check if any filters are active (not at default values)
   const areFiltersActive = () => {
     return (
-      metacriticScoreFilter[0] !== 0 ||
-      metacriticScoreFilter[1] !== 100 ||
-      salePriceRange[0] !== 0 ||
-      salePriceRange[1] !== 10 ||
+      // Remove metacriticScoreFilter from client-side filter check since it's now server-side
       savingsFilter[0] !== 0 ||
       savingsFilter[1] !== 100 ||
       dealRatingFilter[0] !== 0 ||
       dealRatingFilter[1] !== 10
     );
-    // Note: searchQuery is NOT included here since it's handled server-side
+    // Note: searchQuery, salePriceRange, and metacriticScoreFilter are NOT included here since they're handled server-side
   };
 
   const filteredDeals = deals
-    .filter(
-      (deal) =>
-        Number(deal.metacriticScore) >= metacriticScoreFilter[0] &&
-        Number(deal.metacriticScore) <= metacriticScoreFilter[1]
-    )
-    .filter(
-      (deal) =>
-        Number(deal.salePrice) >= salePriceRange[0] &&
-        Number(deal.salePrice) <= salePriceRange[1]
-    )
+    // Remove client-side Metacritic filtering since we now use server-side filtering
     .filter(
       (deal) =>
         Number(deal.savings) >= savingsFilter[0] &&
@@ -87,9 +96,10 @@ const DealsPage: React.FC = () => {
         Number(deal.dealRating) >= dealRatingFilter[0] &&
         Number(deal.dealRating) <= dealRatingFilter[1]
     );
-  // Removed client-side search filter since we now use server-side search
+  // Removed client-side search, price, Metacritic filters, and sorting since we now use server-side processing
 
-  const sortedAndFilteredDeals = sortDeals(filteredDeals, sortOption);
+  // Remove client-side sorting since we now use server-side sorting
+  const sortedAndFilteredDeals = filteredDeals;
 
   const handleSortChange = (newSortOption: SortOption) => {
     setSortOption(newSortOption);
