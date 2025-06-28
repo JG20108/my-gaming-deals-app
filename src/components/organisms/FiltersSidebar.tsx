@@ -1,6 +1,7 @@
 import React from 'react';
 import SearchBar from '../molecules/SearchBar';
 import RangeFilterDual from '../molecules/RangeFilterDual';
+import SortControls, { SortOption } from '../molecules/SortControls';
 import PaginationControls from '../molecules/PaginationControls';
 
 interface FiltersSidebarProps {
@@ -14,6 +15,8 @@ interface FiltersSidebarProps {
   setSavingsFilter: React.Dispatch<React.SetStateAction<[number, number]>>;
   dealRatingFilter: [number, number];
   setDealRatingFilter: React.Dispatch<React.SetStateAction<[number, number]>>;
+  sortOption: SortOption;
+  onSortChange: (sortOption: SortOption) => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -28,12 +31,17 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
   setSavingsFilter,
   dealRatingFilter,
   setDealRatingFilter,
+  sortOption,
+  onSortChange,
   currentPage,
   totalPages,
   onPageChange,
 }) => (
   <div className="filters-sidebar">
     <SearchBar onSearch={(query) => console.log(query)} />
+
+    <SortControls sortOption={sortOption} onSortChange={onSortChange} />
+
     <RangeFilterDual
       label="Metacritic Score"
       min={0}

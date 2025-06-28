@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { fetchDeals } from '../../services/DealService';
 import DealsGrid from '../organisms/DealsGrid';
 import FiltersSidebar from '../organisms/FiltersSidebar';
+import { SortOption } from '../molecules/SortControls';
+import { sortDeals, DEFAULT_SORT_OPTION } from '../../utils/sortUtils';
 
 interface Deal {
   dealID: string;
@@ -31,17 +33,14 @@ const DealsPage: React.FC = () => {
   const [dealRatingFilter, setDealRatingFilter] = useState<[number, number]>([
     0, 10,
   ]);
+  const [sortOption, setSortOption] = useState<SortOption>(DEFAULT_SORT_OPTION);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     fetchDeals(currentPage)
       .then(({ deals, totalPageCount }) => {
-        const sortedDeals = deals.sort(
-          (a: Deal, b: Deal) =>
-            Number(b.metacriticScore) - Number(a.metacriticScore)
-        );
-        setDeals(sortedDeals);
+        setDeals(deals);
         setTotalPages(totalPageCount ? parseInt(totalPageCount, 10) : 0);
       })
       .catch((error: Error) => {
@@ -71,9 +70,15 @@ const DealsPage: React.FC = () => {
         Number(deal.dealRating) <= dealRatingFilter[1]
     );
 
+  const sortedAndFilteredDeals = sortDeals(filteredDeals, sortOption);
+
+  const handleSortChange = (newSortOption: SortOption) => {
+    setSortOption(newSortOption);
+  };
+
   return (
     <div>
-      <DealsGrid deals={filteredDeals} />
+      <DealsGrid deals={sortedAndFilteredDeals} />
       <FiltersSidebar
         metacriticScoreFilter={metacriticScoreFilter}
         setMetacriticScoreFilter={setMetacriticScoreFilter}
@@ -83,6 +88,8 @@ const DealsPage: React.FC = () => {
         setSavingsFilter={setSavingsFilter}
         dealRatingFilter={dealRatingFilter}
         setDealRatingFilter={setDealRatingFilter}
+        sortOption={sortOption}
+        onSortChange={handleSortChange}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
