@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit",
+    "type-check:strict": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
+    "preview": "vite preview",
+    "validate": "npm run type-check:strict && npm run lint && npm run build"
   },
   "dependencies": {
     "axios": "^1.6.8",
