@@ -1,10 +1,6 @@
 import React from 'react';
 
-export type SortField =
-  | 'dealRating'
-  | 'metacriticScore'
-  | 'salePrice'
-  | 'savings';
+export type SortField = 'dealRating' | 'salePrice' | 'savings';
 export type SortDirection = 'asc' | 'desc';
 
 export interface SortOption {
@@ -23,7 +19,6 @@ const SortControls: React.FC<SortControlsProps> = ({
 }) => {
   const sortFields: { value: SortField; label: string }[] = [
     { value: 'dealRating', label: 'Deal Rating' },
-    { value: 'metacriticScore', label: 'Metacritic Score' },
     { value: 'salePrice', label: 'Sale Price' },
     { value: 'savings', label: 'Savings' },
   ];

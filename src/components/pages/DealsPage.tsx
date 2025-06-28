@@ -1,24 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { fetchDeals } from '../../services/DealService';
-import DealsGrid from '../organisms/DealsGrid';
-import FiltersSidebar from '../organisms/FiltersSidebar';
-import DealsHeader from '../organisms/DealsHeader';
-import { SortOption } from '../molecules/SortControls';
+import { Deal } from '../../types';
 import { DEFAULT_SORT_OPTION, mapSortToAPI } from '../../utils/sortUtils';
-
-interface Deal {
-  dealID: string;
-  title: string;
-  salePrice: string;
-  normalPrice: string;
-  savings: string;
-  thumb: string;
-  metacriticScore: string;
-  metacriticLink: string;
-  steamRatingText: string;
-  steamAppID: string;
-  dealRating: string;
-}
+import { SortOption } from '../molecules/SortControls';
+import DealsGrid from '../organisms/DealsGrid';
+import DealsHeader from '../organisms/DealsHeader';
+import FiltersSidebar from '../organisms/FiltersSidebar';
 
 const DealsPage: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);

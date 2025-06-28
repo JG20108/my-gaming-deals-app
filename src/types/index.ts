@@ -7,7 +7,7 @@ export interface Deal {
   thumb: string;
   metacriticScore: string;
   metacriticLink: string;
-  steamRatingText: string;
+  steamRatingText: string | null;
   steamAppID: string;
   dealRating: string;
 }

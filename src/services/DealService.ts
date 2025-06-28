@@ -4,8 +4,30 @@
  * Follows Single Responsibility Principle - handles only data fetching logic
  */
 
+import { Deal } from '../types';
+
+// TypeScript interfaces for type safety
+interface DealsResponse {
+  deals: Deal[];
+  totalPageCount: number;
+}
+
+interface RawDeal {
+  dealID: string;
+  title: string;
+  salePrice: string;
+  normalPrice: string;
+  savings: string;
+  thumb: string;
+  metacriticScore: string;
+  metacriticLink: string;
+  steamRatingText: string | null;
+  steamAppID: string;
+  dealRating: string;
+}
+
 // Simple in-memory cache with TTL
-const cache = new Map<string, { data: any; expiry: number }>();
+const cache = new Map<string, { data: DealsResponse; expiry: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
@@ -13,7 +35,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * @param key - Cache key to check
  * @returns Cached data if valid, null if expired or not found
  */
-const getCachedData = (key: string) => {
+const getCachedData = (key: string): DealsResponse | null => {
   const cached = cache.get(key);
   if (cached && cached.expiry > Date.now()) {
     return cached.data;
@@ -29,7 +51,7 @@ const getCachedData = (key: string) => {
  * @param key - Cache key
  * @param data - Data to cache
  */
-const setCachedData = (key: string, data: any) => {
+const setCachedData = (key: string, data: DealsResponse): void => {
   cache.set(key, {
     data,
     expiry: Date.now() + CACHE_TTL,
@@ -52,7 +74,9 @@ interface FetchDealsParams {
  * @param params - API parameters for filtering, sorting, and pagination
  * @returns Promise containing deals array and total page count
  */
-export const fetchDeals = async (params: FetchDealsParams = {}) => {
+export const fetchDeals = async (
+  params: FetchDealsParams = {}
+): Promise<DealsResponse> => {
   const {
     pageNumber = 0,
     pageSize = 60,
@@ -116,10 +140,10 @@ export const fetchDeals = async (params: FetchDealsParams = {}) => {
     // Get total page count from response headers
     const totalPageCount = response.headers.get('X-Total-Page-Count');
 
-    const rawDeals = await response.json();
+    const rawDeals = (await response.json()) as RawDeal[];
 
     // Transform the API response to match our interface
-    const deals = rawDeals.map((deal: any) => ({
+    const deals: Deal[] = rawDeals.map((deal: RawDeal) => ({
       dealID: deal.dealID,
       title: deal.title,
       salePrice: deal.salePrice,
@@ -133,7 +157,7 @@ export const fetchDeals = async (params: FetchDealsParams = {}) => {
       dealRating: deal.dealRating,
     }));
 
-    const result = {
+    const result: DealsResponse = {
       deals,
       totalPageCount: totalPageCount ? parseInt(totalPageCount, 10) : 1,
     };
