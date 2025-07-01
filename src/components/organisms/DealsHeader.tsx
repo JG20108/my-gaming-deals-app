@@ -4,7 +4,7 @@ import {
   generateFilterDescription,
   generateSortDescription,
 } from '../../utils/filterDisplayUtils';
-import Logo from '../../assets/Logo.png';
+import Logo from '../../assets/GundamLogo2.png';
 
 interface DealsHeaderProps {
   metacriticScoreFilter: [number, number];
